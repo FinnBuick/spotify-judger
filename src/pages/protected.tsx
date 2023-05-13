@@ -1,17 +1,39 @@
-import React from 'react';
-import { useSession, signIn, signOut } from 'next-auth/react';
-import Image from 'next/image';
+//  ** React
 
-export async function fetchProfile(token: string): Promise<any> {
-  const result = await fetch('https://api.spotify.com/v1/me', {
-    method: 'GET',
-    headers: { Authorization: `Bearer ${token}` },
-  });
+// ** Next Auth
+import { signIn, signOut, useSession } from 'next-auth/react';
 
-  return await result.json();
-}
+// ** Next.js
+
+// ** React Query
+import { generatePrompt } from '@/generatePrompt';
+import { useMutation } from 'react-query';
+
 export default function Protected() {
   const { data: session, status } = useSession();
+
+  const { mutate, isLoading } = useMutation(
+    async () => {
+      if (!session) throw new Error('Not signed in');
+      if (!session.accessToken) throw new Error('No access token');
+
+      const prompt = await generatePrompt(session.accessToken, 'artists');
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ prompt }),
+      });
+      const data = await response.json();
+      return data;
+    },
+    {
+      onSuccess: (data) => {
+        console.log(data);
+      },
+    }
+  );
 
   if (session) {
     return (
@@ -19,8 +41,14 @@ export default function Protected() {
         <div>signed in</div>
         <p>email: {session.user?.email}</p>
         <p>name: {session.user?.name}</p>
-        <Image src={session.user?.image!} width={100} height={100} alt="Spotify Profile Picture" />
-        <button onClick={() => signOut()}>sign out</button>
+
+        <button onClick={() => mutate()} className="btn btn-primary">
+          {isLoading ? 'Generating ...' : 'Generate'}
+        </button>
+
+        <button className="btn" onClick={() => signOut()}>
+          sign out
+        </button>
       </div>
     );
   }
@@ -28,7 +56,9 @@ export default function Protected() {
   return (
     <div>
       <div>not signed in</div>
-      <button onClick={() => signIn()}>sign in</button>
+      <button className="btn" onClick={() => signIn()}>
+        sign in
+      </button>
     </div>
   );
 }

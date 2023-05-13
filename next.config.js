@@ -10,6 +10,6 @@ module.exports = {
     SPOTIFY_CLIENT_SECRET: process.env.SPOTIFY_CLIENT_SECRET,
   },
   images: {
-    domains: ['scontent-cdg4-2.xx.fbcdn.net'],
+    domains: ['scontent-cdg4-2.xx.fbcdn.net', ' scontent-ams4-1.xx.fbcdn.net'],
   },
 };
