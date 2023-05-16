@@ -9,8 +9,8 @@ export async function getProfile(token: string): Promise<Profile> {
   return await result.json();
 }
 
-export async function getUsersTopItems(accessToken: string, type: 'artists' | 'tracks'): Promise<SpotifyUserTopItems> {
-  const response = await fetch(`https://api.spotify.com/v1/me/top/${type}`, {
+export async function getUsersTopArtists(accessToken: string): Promise<SpotifyUserTopItems> {
+  const response = await fetch(`https://api.spotify.com/v1/me/top/artists`, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
@@ -19,9 +19,9 @@ export async function getUsersTopItems(accessToken: string, type: 'artists' | 't
   return response.json();
 }
 
-export async function generatePrompt(accessToken: string, type: 'artists' | 'tracks'): Promise<string> {
-  const { items } = await getUsersTopItems(accessToken, type);
-  const prompt = `Write a funny five sentence Spotify profile description with 2 emojis maximum, with the following information:
+export async function generatePrompt(accessToken: string): Promise<string> {
+  const { items } = await getUsersTopArtists(accessToken);
+  const prompt = `Write a sassy five sentence review of a persons taste in music with the following information:
 - Listens to ${items
     .map((item) => item.name)
     .slice(0, 5)
@@ -29,8 +29,7 @@ export async function generatePrompt(accessToken: string, type: 'artists' | 'tra
 - Listens to ${items
     .map((item) => item.genres[0])
     .slice(0, 5)
-    .join(', ')}
-- Has ${items[0].followers.total} followers`;
+    .join(', ')};`;
 
   return prompt;
 }
