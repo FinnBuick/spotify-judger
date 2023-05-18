@@ -1,8 +1,8 @@
-import { Configuration, OpenAIApi } from 'openai';
+import { Configuration, OpenAIApi, ChatCompletionRequestMessage, CreateChatCompletionResponse } from 'openai';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 type Data = {
-  result?: string;
+  result?: any[];
   error?: {
     message: string;
   };
@@ -23,20 +23,17 @@ export default async function generate(req: NextApiRequest, res: NextApiResponse
     return;
   }
 
-  const prompt = req.body.prompt;
+  const messages = req.body.messages;
+
+  console.log(messages);
 
   try {
-    const completion = await openai.createCompletion({
-      model: 'text-davinci-003',
-      prompt: prompt,
-      temperature: 0.7,
-      max_tokens: 256,
-      top_p: 1,
-      best_of: 5,
-      frequency_penalty: 1,
-      presence_penalty: 0,
+    const completion = await openai.createChatCompletion({
+      model: 'gpt-3.5-turbo',
+      messages: messages,
     });
-    res.status(200).json({ result: completion.data.choices[0].text });
+
+    res.status(200).json({ result: completion.data.choices });
   } catch (error) {
     // Consider adjusting the error handling logic for your use case
     if (error.response) {
