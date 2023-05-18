@@ -4,8 +4,8 @@
 
 :root {
   --foreground-rgb: 0, 0, 0;
-  --background-start: #3da26a40;
-  --background-end: #4d5c5340;
+  --background-start: rgba(28, 208, 93, 0.5);
+  --background-end: rgba(148, 187, 233, 0.2);
 
   --bg: #3da26a40;
   --text: #151515;
@@ -89,8 +89,7 @@ body {
   -webkit-font-smoothing: antialiased;
   /* color: rgb(var(--foreground-rgb)); */
   color: black;
-  background-color: linear-gradient(to bottom, transparent, rgb(var(--background-end-rgb)))
-    rgb(var(--background-start-rgb));
+  background: radial-gradient(circle, var(--background-start) 0%, var(--background-end) 100%);
 }
 
 body::before,

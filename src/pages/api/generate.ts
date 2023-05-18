@@ -29,7 +29,7 @@ export default async function generate(req: NextApiRequest, res: NextApiResponse
     const completion = await openai.createCompletion({
       model: 'text-davinci-003',
       prompt: prompt,
-      temperature: 1,
+      temperature: 0.7,
       max_tokens: 256,
       top_p: 1,
       best_of: 5,
