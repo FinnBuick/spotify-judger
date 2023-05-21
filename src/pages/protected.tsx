@@ -1,24 +1,25 @@
 // src/pages/protected.tsx
+import Spinner from '@/components/spinner';
 import { generatePrompt as generateInitialPrompt } from '@/generatePrompt';
 import { useInterval } from '@/hooks/useInterval';
 import { useSession } from 'next-auth/react';
-import { ChatCompletionRequestMessage, CreateChatCompletionResponseChoicesInner } from 'openai';
-import { useEffect, useState } from 'react';
+import { ChatCompletionRequestMessage } from 'openai';
+import { useState } from 'react';
 import { useMutation } from 'react-query';
 
-export interface ChatItem extends ChatCompletionRequestMessage {
-  // time?: string;
-}
+import data from '../../sampleConversation.json';
+
+export interface ChatItem extends ChatCompletionRequestMessage {}
 
 export default function Protected() {
   const { data: session } = useSession();
 
-  const [hasInitiated, setHasInitiated] = useState(false);
+  const [hasInitiated, setHasInitiated] = useState(true);
   const [inputText, setInputText] = useState<string>('');
-  const [chatHistory, setChatHistory] = useState<ChatItem[]>([]);
+  const [chatHistory, setChatHistory] = useState<ChatItem[]>(data);
 
   const [currentLoadingTextIndex, setCurrentLoadingTextIndex] = useState(0);
-  const loadingTextArray = ['Critiquing...', 'Judging...', 'Evaluating...', 'Analyzing...'];
+  const loadingTextArray = ['Critiquing', 'Judging', 'Evaluating', 'Analyzing'];
 
   useInterval(() => {
     setCurrentLoadingTextIndex((currentLoadingTextIndex + 1) % loadingTextArray.length);
@@ -29,10 +30,10 @@ export default function Protected() {
       if (!session) throw new Error('Not signed in');
       if (!session.accessToken) throw new Error('No access token');
 
-      let messages: ChatItem[] = [];
+      let messages: ChatItem[];
       if (!hasInitiated) {
-        const temp = await generateInitialPrompt(session.accessToken);
-        messages = [...temp];
+        const initialPromptMessages = await generateInitialPrompt(session.accessToken);
+        messages = [...initialPromptMessages];
         setChatHistory(messages);
       } else {
         messages = [
@@ -45,8 +46,6 @@ export default function Protected() {
         setChatHistory(messages);
       }
 
-      console.log('messages', messages);
-
       const response = await fetch('/api/generate', {
         method: 'POST',
         headers: {
@@ -54,13 +53,11 @@ export default function Protected() {
         },
         body: JSON.stringify({ messages }),
       });
-      const data = await response.json();
-      return data;
+      return await response.json();
     },
     {
       onSuccess: ({ result }) => {
         setHasInitiated(true);
-        console.log({ result });
         setChatHistory((prevState) => [...prevState, result[0].message]);
       },
     }
@@ -71,55 +68,59 @@ export default function Protected() {
     setInputText('');
   };
 
-  console.log({ chatHistory });
-
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center">
+    <div className="flex-grow flex flex-col items-center md:pb-4">
       {!hasInitiated && (
         <button onClick={() => mutate()} className={`btn-primary btn-wide btn ${isLoading && 'loading'}`}>
-          {isLoading ? loadingTextArray[currentLoadingTextIndex] : 'Get Judged'}
+          {isLoading ? `${loadingTextArray[currentLoadingTextIndex]}...` : 'Get Judged'}
         </button>
       )}
 
       {hasInitiated && (
-        <div className="max-w-prose">
-          {chatHistory.slice(1).map(({ role, content, time }, index) => (
-            <div key={index} className={`chat ${role === 'assistant' ? 'chat-start' : 'chat-end'}`}>
-              <div className="chat-image avatar">
-                <div className="w-10 rounded-full">
-                  <img src={role === 'assistant' ? '/open-ai-logo.svg' : session?.user?.image} />
+        <div className="flex-grow flex flex-col rounded-lg shadow-xl backdrop-contrast-75 overflow-hidden md:w-2/3 xl:w-1/2">
+          <div className="flex-grow px-1 overflow-y-scroll">
+            {chatHistory.slice(3).map(({ role, content }, index) => (
+              <div key={index} className={`chat last:pb-4 ${role === 'assistant' ? 'chat-start' : 'chat-end'}`}>
+                <div className="chat-image avatar">
+                  <div className="w-10 rounded-full">
+                    <img src={role === 'assistant' ? '/open-ai-logo.svg' : session?.user?.image} />
+                  </div>
                 </div>
+                <div className="chat-header">{role === 'assistant' ? 'FantanoAI' : session?.user?.name}</div>
+                <div className={`chat-bubble ${role === 'user' && 'chat-bubble-primary'}`}>{content}</div>
               </div>
-              <div className="chat-header">
-                {role === 'assistant' ? 'FantanoAI' : session?.user?.name}
-                <time className="pl-2 text-xs opacity-50">{time}</time>
+            ))}
+
+            {isLoading && (
+              <div className="p-1 pb-3">
+                <Spinner />
               </div>
-              <div className="chat-bubble">{content}</div>
-              <div className="chat-footer opacity-50">Delivered</div>
-            </div>
-          ))}
+            )}
+            <div className="[overflow-anchor:auto] h-[1px]" />
+          </div>
 
           {/* text input */}
-          <div className="flex items-center justify-center">
-            <input
-              type="text"
-              value={inputText}
-              onChange={(event) => setInputText(event.target.value)}
-              className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Type a message..."
-              onKeyDown={(event) => {
-                if (event.key === 'Enter') {
-                  handleSendMessage();
-                }
-              }}
-            />
-
-            <button className="btn-primary btn-wide btn" onClick={handleSendMessage}>
-              Send
-            </button>
+          <div>
+            <div className="input-group flex items-center justify-center">
+              <input
+                type="text"
+                value={inputText}
+                onChange={(event) => setInputText(event.target.value)}
+                className="input-md w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Type a message..."
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter') {
+                    handleSendMessage();
+                  }
+                }}
+              />
+              <button className="btn-primary btn-md sm:btn-wide" onClick={handleSendMessage}>
+                Send
+              </button>
+            </div>
           </div>
         </div>
       )}
-    </main>
+    </div>
   );
 }

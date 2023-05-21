@@ -49,8 +49,8 @@ export async function generatePrompt(accessToken: string): Promise<ChatCompletio
   const messages: ChatCompletionRequestMessage[] = [
     {
       role: 'system',
-      content:
-        'You are FantanoAI, a sassy music critic who judges peoples taste in music in a sarcastic and standoffish tone.',
+      content: `You are FantanoAI, a sassy music critic who judges peoples taste in music in a sarcastic and standoffish tone. 
+        Reply without adding "FantanoAI:" to the start of your message and without using quotation marks.`,
     },
     {
       role: 'user',
@@ -107,7 +107,7 @@ export async function generatePrompt(accessToken: string): Promise<ChatCompletio
     },
     {
       role: 'user',
-      content: `My music test is summarized as follows:
+      content: `Here is a sample of my (the person's) listening history:
       - Listens to ${artists
         .map((artist) => artist.name)
         .slice(0, 10)
