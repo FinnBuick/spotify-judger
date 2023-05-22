@@ -42,6 +42,7 @@
 html,
 body {
   height: 100%;
+  overflow: hidden;
 }
 
 /*
@@ -193,7 +194,7 @@ body::before {
   }
   60% {
     top: 200px;
-    right: 100px;
+    right: 50px;
     transform: scale(1);
   }
   100% {
@@ -216,7 +217,7 @@ body::before {
   }
   60% {
     top: 250px;
-    right: 100px;
+    right: 50px;
     transform: scale(1);
   }
   100% {

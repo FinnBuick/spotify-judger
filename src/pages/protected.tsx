@@ -7,16 +7,14 @@ import { ChatCompletionRequestMessage } from 'openai';
 import { useState } from 'react';
 import { useMutation } from 'react-query';
 
-import data from '../../sampleConversation.json';
-
 export interface ChatItem extends ChatCompletionRequestMessage {}
 
 export default function Protected() {
   const { data: session } = useSession();
 
-  const [hasInitiated, setHasInitiated] = useState(true);
+  const [hasInitiated, setHasInitiated] = useState(false);
   const [inputText, setInputText] = useState<string>('');
-  const [chatHistory, setChatHistory] = useState<ChatItem[]>(data);
+  const [chatHistory, setChatHistory] = useState<ChatItem[]>([]);
 
   const [currentLoadingTextIndex, setCurrentLoadingTextIndex] = useState(0);
   const loadingTextArray = ['Critiquing', 'Judging', 'Evaluating', 'Analyzing'];
@@ -71,9 +69,11 @@ export default function Protected() {
   return (
     <div className="flex-grow flex flex-col items-center md:pb-4">
       {!hasInitiated && (
-        <button onClick={() => mutate()} className={`btn-primary btn-wide btn ${isLoading && 'loading'}`}>
-          {isLoading ? `${loadingTextArray[currentLoadingTextIndex]}...` : 'Get Judged'}
-        </button>
+        <div className="flex-grow flex justify-center items-center">
+          <button onClick={() => mutate()} className={`btn-primary btn-wide btn ${isLoading && 'loading'}`}>
+            {isLoading ? `${loadingTextArray[currentLoadingTextIndex]}...` : 'Get Judged'}
+          </button>
+        </div>
       )}
 
       {hasInitiated && (
@@ -100,7 +100,7 @@ export default function Protected() {
           </div>
 
           {/* text input */}
-          <div>
+          <div className="pb-0.5 px-0.5">
             <div className="input-group flex items-center justify-center">
               <input
                 type="text"

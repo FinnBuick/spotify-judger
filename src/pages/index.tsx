@@ -11,7 +11,7 @@ export default function Home() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center">
+    <main className="flex min-h-screen flex-col items-center justify-center w-full overflow-hidden">
       <div className="mx-auto max-w-2xl p-8">
         <div className="text-center">
           <Image className="mx-auto" src="/Spotify_logo_without_text.svg" alt="Spotify Logo" width={64} height={64} />
