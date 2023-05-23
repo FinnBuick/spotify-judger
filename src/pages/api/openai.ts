@@ -1,19 +1,30 @@
-import { Configuration, OpenAIApi, ChatCompletionRequestMessage, CreateChatCompletionResponse } from 'openai';
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { Configuration, OpenAIApi } from 'openai';
 
-type Data = {
+// Types
+interface ResponseData {
   result?: any[];
   error?: {
     message: string;
   };
+}
+
+type OpenAIError = {
+  response?: {
+    status: number;
+    data: any;
+  };
+  message?: string;
 };
 
+// OpenAI API
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 });
 const openai = new OpenAIApi(configuration);
 
-export default async function generate(req: NextApiRequest, res: NextApiResponse<Data>) {
+// API route
+export default async function generate(req: NextApiRequest, res: NextApiResponse<ResponseData>) {
   if (!configuration.apiKey) {
     res.status(500).json({
       error: {
@@ -25,8 +36,6 @@ export default async function generate(req: NextApiRequest, res: NextApiResponse
 
   const messages = req.body.messages;
 
-  console.log(messages);
-
   try {
     const completion = await openai.createChatCompletion({
       model: 'gpt-3.5-turbo',
@@ -34,8 +43,8 @@ export default async function generate(req: NextApiRequest, res: NextApiResponse
     });
 
     res.status(200).json({ result: completion.data.choices });
-  } catch (error) {
-    // Consider adjusting the error handling logic for your use case
+  } catch (err) {
+    const error = err as OpenAIError;
     if (error.response) {
       console.error(error.response.status, error.response.data);
       res.status(error.response.status).json(error.response.data);

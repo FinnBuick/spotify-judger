@@ -1,6 +1,6 @@
 // src/pages/protected.tsx
 import Spinner from '@/components/spinner';
-import { generatePrompt as generateInitialPrompt } from '@/generatePrompt';
+import { generatePrePrompt } from '@/generatePrompt';
 import { useInterval } from '@/hooks/useInterval';
 import { useSession } from 'next-auth/react';
 import { ChatCompletionRequestMessage } from 'openai';
@@ -25,26 +25,23 @@ export default function Protected() {
 
   const { mutate, isLoading } = useMutation(
     async () => {
-      if (!session) throw new Error('Not signed in');
-      if (!session.accessToken) throw new Error('No access token');
+      // get spotify data
+      const spotifyData = await fetch('/api/spotify');
+      const data = await spotifyData.json();
+      const { topArtists, topTracks } = data.result;
 
-      let messages: ChatItem[];
+      let messages: ChatItem[] = [];
       if (!hasInitiated) {
-        const initialPromptMessages = await generateInitialPrompt(session.accessToken);
-        messages = [...initialPromptMessages];
-        setChatHistory(messages);
+        // generate chat completion pre-prompt
+        const prePrompt = generatePrePrompt(topArtists, topTracks);
+        messages = [...prePrompt];
       } else {
-        messages = [
-          ...chatHistory,
-          {
-            role: 'user',
-            content: inputText,
-          },
-        ];
-        setChatHistory(messages);
+        messages = [...chatHistory, { role: 'user', content: inputText }];
       }
+      setChatHistory(messages);
 
-      const response = await fetch('/api/generate', {
+      // send initial prompt to openai
+      const response = await fetch('/api/openai', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -56,7 +53,7 @@ export default function Protected() {
     {
       onSuccess: ({ result }) => {
         setHasInitiated(true);
-        setChatHistory((prevState) => [...prevState, result[0].message]);
+        setChatHistory((prevState) => [...prevState, result[0]?.message]);
       },
     }
   );

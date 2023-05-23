@@ -1,51 +1,8 @@
 // src/generatePrompt.ts
 import { ChatCompletionRequestMessage } from 'openai';
-import { Profile, ArtistObject, TrackObject, Timerange } from './types/spotify';
-import { ChatItem } from './pages/protected';
+import { ArtistObject, TrackObject } from './types/spotify';
 
-export async function getProfile(token: string): Promise<Profile> {
-  const result = await fetch('https://api.spotify.com/v1/me', {
-    method: 'GET',
-    headers: { Authorization: `Bearer ${token}` },
-  });
-
-  return await result.json();
-}
-
-export async function getUsersTopArtists(
-  accessToken: string,
-  timeRange: Timerange = 'long_term',
-  limit: number = 10
-): Promise<ArtistObject[]> {
-  const response = await fetch(`https://api.spotify.com/v1/me/top/artists?time_range=${timeRange}&limit=${limit}`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-
-  const json = await response.json();
-  return json.items;
-}
-
-export async function getUsersTopTracks(
-  accessToken: string,
-  timeRange: Timerange = 'long_term',
-  limit: number = 10
-): Promise<TrackObject[]> {
-  const response = await fetch(`https://api.spotify.com/v1/me/top/tracks?time_range=${timeRange}&limit=${limit}`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-
-  const json = await response.json();
-  return json.items;
-}
-
-export async function generatePrompt(accessToken: string): Promise<ChatCompletionRequestMessage[]> {
-  const artists = await getUsersTopArtists(accessToken, 'short_term');
-  const tracks = await getUsersTopTracks(accessToken, 'short_term');
-
+export function generatePrePrompt(artists: ArtistObject[], tracks: TrackObject[]): ChatCompletionRequestMessage[] {
   const messages: ChatCompletionRequestMessage[] = [
     {
       role: 'system',
@@ -120,6 +77,5 @@ export async function generatePrompt(accessToken: string): Promise<ChatCompletio
       name: 'Person',
     },
   ];
-
   return messages;
 }
