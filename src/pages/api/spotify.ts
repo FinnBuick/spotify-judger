@@ -4,7 +4,17 @@ import { ArtistObject, Timerange, TrackObject } from '../../types/spotify';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from './auth/[...nextauth]';
 
-export default async function generate(req: NextApiRequest, res: NextApiResponse) {
+export interface SpotifyResponse {
+  result?: {
+    topArtists: ArtistObject[];
+    topTracks: TrackObject[];
+  };
+  error?: {
+    message: string;
+  };
+}
+
+export default async function generate(req: NextApiRequest, res: NextApiResponse<SpotifyResponse>) {
   const session = await getServerSession(req, res, authOptions);
   const accessToken = session?.accessToken;
 
@@ -42,8 +52,8 @@ export default async function generate(req: NextApiRequest, res: NextApiResponse
 
 async function getUsersTopArtists(
   accessToken: string,
-  timeRange: Timerange = 'long_term',
-  limit: number = 10
+  timeRange: Timerange = 'medium_term',
+  limit: number = 20
 ): Promise<ArtistObject[]> {
   const response = await fetch(`https://api.spotify.com/v1/me/top/artists?time_range=${timeRange}&limit=${limit}`, {
     headers: {
@@ -57,8 +67,8 @@ async function getUsersTopArtists(
 
 async function getUsersTopTracks(
   accessToken: string,
-  timeRange: Timerange = 'long_term',
-  limit: number = 10
+  timeRange: Timerange = 'medium_term',
+  limit: number = 20
 ): Promise<TrackObject[]> {
   const response = await fetch(`https://api.spotify.com/v1/me/top/tracks?time_range=${timeRange}&limit=${limit}`, {
     headers: {

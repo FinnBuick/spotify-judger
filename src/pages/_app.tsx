@@ -1,8 +1,9 @@
 import Layout from '@/components/layout';
+import '@/styles/globals.css';
 import { SessionProvider } from 'next-auth/react';
 import type { AppProps } from 'next/app';
+import { Toaster } from 'react-hot-toast';
 import { QueryClient, QueryClientProvider } from 'react-query';
-import '@/styles/globals.css';
 
 const queryClient = new QueryClient();
 
@@ -14,6 +15,7 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
           <Component {...pageProps} />
         </Layout>
       </QueryClientProvider>
+      <Toaster />
     </SessionProvider>
   );
 }

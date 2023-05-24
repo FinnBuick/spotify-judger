@@ -1,15 +1,20 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { Configuration, OpenAIApi } from 'openai';
+import { Configuration, CreateChatCompletionResponseChoicesInner, OpenAIApi } from 'openai';
 
 // Types
-interface ResponseData {
-  result?: any[];
+export interface OpenAIResponse {
+  result?: {
+    message: {
+      content: string;
+      role: string;
+    };
+  }[];
   error?: {
     message: string;
   };
 }
 
-type OpenAIError = {
+export type OpenAIError = {
   response?: {
     status: number;
     data: any;
@@ -24,7 +29,7 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 // API route
-export default async function generate(req: NextApiRequest, res: NextApiResponse<ResponseData>) {
+export default async function generate(req: NextApiRequest, res: NextApiResponse<OpenAIResponse>) {
   if (!configuration.apiKey) {
     res.status(500).json({
       error: {

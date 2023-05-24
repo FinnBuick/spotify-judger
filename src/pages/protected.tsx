@@ -1,11 +1,41 @@
 // src/pages/protected.tsx
 import Spinner from '@/components/spinner';
-import { generatePrePrompt } from '@/generatePrompt';
+import { PROMPT_LENGTH, generatePrePrompt } from '@/generatePrompt';
 import { useInterval } from '@/hooks/useInterval';
+import { NextApiResponse } from 'next';
 import { useSession } from 'next-auth/react';
 import { ChatCompletionRequestMessage } from 'openai';
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 import { useMutation } from 'react-query';
+import { OpenAIResponse } from './api/openai';
+import { SpotifyResponse } from './api/spotify';
+
+async function fetchSpotifyData() {
+  try {
+    const spotifyData = await fetch('/api/spotify');
+    return (await spotifyData.json()) as SpotifyResponse;
+  } catch (error) {
+    toast.error('Error fetching Spotify data');
+    throw new Error('Error fetching Spotify data');
+  }
+}
+
+async function fetchOpenAI(messages: ChatItem[]) {
+  try {
+    const openaiData = await fetch('/api/openai', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ messages }),
+    });
+    return (await openaiData.json()) as OpenAIResponse;
+  } catch (error) {
+    toast.error('Error fetching OpenAI data');
+    throw new Error('Error fetching OpenAI data');
+  }
+}
 
 export interface ChatItem extends ChatCompletionRequestMessage {}
 
@@ -21,18 +51,18 @@ export default function Protected() {
 
   useInterval(() => {
     setCurrentLoadingTextIndex((currentLoadingTextIndex + 1) % loadingTextArray.length);
-  }, 2000);
+  }, 2000); // 2 seconds
 
   const { mutate, isLoading } = useMutation(
     async () => {
-      // get spotify data
-      const spotifyData = await fetch('/api/spotify');
-      const data = await spotifyData.json();
-      const { topArtists, topTracks } = data.result;
-
       let messages: ChatItem[] = [];
+
+      // on first load, get spotify data and generate pre-prompt
       if (!hasInitiated) {
-        // generate chat completion pre-prompt
+        const spotifyRes = await fetchSpotifyData();
+        if (!spotifyRes?.result) return;
+        const { topArtists, topTracks } = spotifyRes.result;
+
         const prePrompt = generatePrePrompt(topArtists, topTracks);
         messages = [...prePrompt];
       } else {
@@ -40,20 +70,21 @@ export default function Protected() {
       }
       setChatHistory(messages);
 
-      // send initial prompt to openai
-      const response = await fetch('/api/openai', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ messages }),
-      });
-      return await response.json();
+      // send messages to openai
+      const openaiRes = await fetchOpenAI(messages);
+      if (!openaiRes?.result) return;
+
+      return openaiRes;
     },
     {
-      onSuccess: ({ result }) => {
+      onSuccess: (res) => {
+        if (!res || !res?.result) return;
         setHasInitiated(true);
-        setChatHistory((prevState) => [...prevState, result[0]?.message]);
+        const chatItem: ChatItem = {
+          role: 'assistant',
+          content: res.result[0]?.message.content,
+        };
+        setChatHistory((prevState) => [...prevState, chatItem]);
       },
     }
   );
@@ -76,7 +107,7 @@ export default function Protected() {
       {hasInitiated && (
         <div className="flex-grow flex flex-col rounded-lg shadow-xl backdrop-contrast-75 overflow-hidden md:w-2/3 xl:w-1/2">
           <div className="flex-grow px-1 overflow-y-scroll">
-            {chatHistory.slice(3).map(({ role, content }, index) => (
+            {chatHistory.slice(PROMPT_LENGTH).map(({ role, content }, index) => (
               <div key={index} className={`chat last:pb-4 ${role === 'assistant' ? 'chat-start' : 'chat-end'}`}>
                 <div className="chat-image avatar">
                   <div className="w-10 rounded-full">
