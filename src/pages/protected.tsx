@@ -1,41 +1,13 @@
 // src/pages/protected.tsx
+import createChatCompletion from '@/api/createChatCompletion';
+import { fetchSpotifyData } from '@/api/fetchSpotifyData';
 import Spinner from '@/components/spinner';
 import { PROMPT_LENGTH, generatePrePrompt } from '@/generatePrompt';
 import { useInterval } from '@/hooks/useInterval';
-import { NextApiResponse } from 'next';
 import { useSession } from 'next-auth/react';
 import { ChatCompletionRequestMessage } from 'openai';
 import { useState } from 'react';
-import toast from 'react-hot-toast';
 import { useMutation } from 'react-query';
-import { OpenAIResponse } from './api/openai';
-import { SpotifyResponse } from './api/spotify';
-
-async function fetchSpotifyData() {
-  try {
-    const spotifyData = await fetch('/api/spotify');
-    return (await spotifyData.json()) as SpotifyResponse;
-  } catch (error) {
-    toast.error('Error fetching Spotify data');
-    throw new Error('Error fetching Spotify data');
-  }
-}
-
-async function fetchOpenAI(messages: ChatItem[]) {
-  try {
-    const openaiData = await fetch('/api/openai', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ messages }),
-    });
-    return (await openaiData.json()) as OpenAIResponse;
-  } catch (error) {
-    toast.error('Error fetching OpenAI data');
-    throw new Error('Error fetching OpenAI data');
-  }
-}
 
 export interface ChatItem extends ChatCompletionRequestMessage {}
 
@@ -71,7 +43,7 @@ export default function Protected() {
       setChatHistory(messages);
 
       // send messages to openai
-      const openaiRes = await fetchOpenAI(messages);
+      const openaiRes = await createChatCompletion(messages);
       if (!openaiRes?.result) return;
 
       return openaiRes;
