@@ -56,7 +56,8 @@ export default function Protected() {
   return (
     <div className="flex-grow flex flex-col items-center md:pb-4">
       {!hasInitiated && (
-        <div className="flex-grow flex justify-center items-center">
+        <div className="flex-grow flex flex-col justify-center items-center">
+          <div className="text-center w-3/4 p-6"></div>
           <button onClick={() => mutate()} className={`btn-primary btn-wide btn ${isLoading && 'loading'}`}>
             {isLoading ? `${loadingTextArray[currentLoadingTextIndex]}...` : 'Get Judged'}
           </button>

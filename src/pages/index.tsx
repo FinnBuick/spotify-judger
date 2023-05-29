@@ -12,11 +12,14 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center w-full overflow-hidden">
-      <div className="mx-auto max-w-2xl p-8">
+      <div className="mx-auto max-w-3xl p-8">
         <div className="text-center">
           <Image className="mx-auto" src="/Spotify_logo_without_text.svg" alt="Spotify Logo" width={64} height={64} />
           <h1 className="text-bg mt-6 text-8xl font-semibold">Spotify Judger</h1>
-          <p className="mt-4 text-slate-900">Get your Spotify listening history judged by OpenAI&apos;s GPT-3.</p>
+          <p className="mt-4 text-slate-900 text-lg">
+            Spotify Judger is a app that helps you get feedback on your music taste from an completely unbiased AI
+            chatbot with objectively exquisite taste in music.
+          </p>
         </div>
 
         <div className="flex justify-center">
