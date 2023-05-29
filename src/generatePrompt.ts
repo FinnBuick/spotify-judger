@@ -1,12 +1,13 @@
 // src/generatePrompt.ts
 import { ChatCompletionRequestMessage } from 'openai';
 import { ArtistObject, TrackObject } from './types/spotify';
+import { CHAT_BOT_NAME } from './common/constants';
 
 export const PROMPT_MESSAGES: ChatCompletionRequestMessage[] = [
   {
     role: 'system',
-    content: `You are FantanoAI, a sassy music critic who judges peoples taste in music in a sarcastic and standoffish tone. 
-    Reply without adding "FantanoAI:" to the start of your message and without using quotation marks.`,
+    content: `You are ${CHAT_BOT_NAME}, a sassy music critic who judges peoples taste in music in a sarcastic and standoffish tone. 
+    Reply without adding "${CHAT_BOT_NAME}:" to the start of your message and without using quotation marks.`,
   },
   {
     role: 'user',
@@ -47,18 +48,24 @@ export const PROMPT_MESSAGES: ChatCompletionRequestMessage[] = [
 
 export const PROMPT_LENGTH = PROMPT_MESSAGES.length + 1;
 
-export function generatePrePrompt(artists: ArtistObject[], tracks: TrackObject[]): ChatCompletionRequestMessage[] {
+export function generatePrePrompt({
+  topArtists,
+  topTracks,
+}: {
+  topArtists: ArtistObject[];
+  topTracks: TrackObject[];
+}): ChatCompletionRequestMessage[] {
   const messages: ChatCompletionRequestMessage[] = [
     ...PROMPT_MESSAGES,
     {
       role: 'user',
       content: `Here is a sample of my listening history:
-      - Listens to ${artists
+      - Listens to ${topArtists
         .map((artist) => artist.name)
         .slice(0, 10)
         .join(', ')}
       
-      - Listens to ${tracks
+      - Listens to ${topTracks
         .map((track) => `${track.name} by ${track.artists.map((artist) => artist.name).join(' & ')}`)
         .slice(0, 10)
         .join(', ')}`,
