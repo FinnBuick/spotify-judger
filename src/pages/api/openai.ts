@@ -4,11 +4,8 @@ import { Configuration, CreateChatCompletionResponseChoicesInner, OpenAIApi } fr
 // Types
 export interface OpenAIResponse {
   result?: {
-    message: {
-      content: string;
-      role: string;
-    };
-  }[];
+    message: string;
+  };
   error?: {
     message: string;
   };
@@ -47,7 +44,17 @@ export default async function generate(req: NextApiRequest, res: NextApiResponse
       messages: messages,
     });
 
-    res.status(200).json({ result: completion.data.choices });
+    const message = completion.data.choices[0].message?.content;
+    if (!message) {
+      res.status(500).json({
+        error: {
+          message: 'An error occurred during your request.',
+        },
+      });
+      return;
+    }
+
+    res.status(200).json({ result: { message } });
   } catch (err) {
     const error = err as OpenAIError;
     if (error.response) {

@@ -10,7 +10,9 @@ export default async function createChatCompletion(messages: ChatItem[]) {
       },
       body: JSON.stringify({ messages }),
     });
-    return (await openaiData.json()) as OpenAIResponse;
+
+    const response = await openaiData.json();
+    return response as OpenAIResponse;
   } catch (error) {
     throw new Error('Error fetching OpenAI data');
   }

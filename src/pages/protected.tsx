@@ -38,7 +38,7 @@ export default function Protected() {
       onSuccess: (res) => {
         if (!res) return;
         setHasInitiated(true);
-        setChatHistory([...chatHistory, { role: 'assistant', content: res[0].message.content }]);
+        setChatHistory([...chatHistory, { role: 'assistant', content: res.message }]);
       },
       onError: () => {
         toast.error('There was an issue connecting to Spotify, please try logging in again.');
