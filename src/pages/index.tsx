@@ -25,7 +25,7 @@ export default function Home() {
         <div className="flex justify-center">
           <button
             className="m-auto mt-6 w-2/3 rounded-lg bg-green-500 px-6 py-3 text-white hover:bg-green-600"
-            onClick={() => signIn('spotify', { callbackUrl: 'http://localhost:3000/protected' })}
+            onClick={() => signIn('spotify', { callbackUrl: '/protected' })}
           >
             Login with Spotify
           </button>

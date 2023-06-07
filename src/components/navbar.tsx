@@ -21,7 +21,7 @@ export default function Navbar() {
               <button
                 onClick={() =>
                   signOut({
-                    callbackUrl: 'http://localhost:3000/',
+                    callbackUrl: '/',
                   })
                 }
               >
