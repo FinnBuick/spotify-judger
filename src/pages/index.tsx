@@ -17,7 +17,7 @@ export default function Home() {
           <Image className="mx-auto" src="/Spotify_logo_without_text.svg" alt="Spotify Logo" width={64} height={64} />
           <h1 className="text-bg mt-6 text-8xl font-semibold">Spotify Judger</h1>
           <p className="mt-4 text-slate-900 text-lg">
-            Spotify Judger is a app that helps you get feedback on your music taste from an completely unbiased AI
+            Spotify Judger is an app that helps you get feedback on your music taste from an completely unbiased AI
             chatbot with objectively exquisite taste in music.
           </p>
         </div>
