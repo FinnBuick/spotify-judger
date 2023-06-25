@@ -16,7 +16,7 @@ export default function ChatBubble({ role, content, avatar }: ChatBubbleProps) {
 
   return (
     <div className={`chat last:pb-4 ${isUser ? 'chat-end' : 'chat-start'}`}>
-      {isUser || !avatar ? (
+      {!avatar ? (
         <div className="chat-image avatar">
           <div className="w-10 rounded-full">
             {/* eslint-disable-next-line @next/next/no-img-element */}

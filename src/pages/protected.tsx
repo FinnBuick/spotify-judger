@@ -1,7 +1,7 @@
 import getInitialMessage from '@/api/getInitialMessage';
 import ChatBubble from '@/components/chatBubble';
+import { LoadingButtonWithChangingText } from '@/components/loadingButton';
 import Spinner from '@/components/spinner';
-import { useInterval } from '@/hooks/useInterval';
 import { useSession } from 'next-auth/react';
 import { ChatCompletionRequestMessage } from 'openai';
 import { useState } from 'react';
@@ -16,13 +16,6 @@ export default function Protected() {
   const [hasInitiated, setHasInitiated] = useState(false);
   const [inputText, setInputText] = useState<string>('');
   const [chatHistory, setChatHistory] = useState<ChatItem[]>([]);
-
-  const [currentLoadingTextIndex, setCurrentLoadingTextIndex] = useState(0);
-  const loadingTextArray = ['Critiquing', 'Judging', 'Evaluating', 'Analyzing'];
-
-  useInterval(() => {
-    setCurrentLoadingTextIndex((currentLoadingTextIndex + 1) % loadingTextArray.length);
-  }, 2000); // 2 seconds
 
   const { mutate, isLoading } = useMutation(
     async () => {
@@ -52,15 +45,15 @@ export default function Protected() {
     setChatHistory([...chatHistory, { role: 'user', content: inputText }]);
     mutate();
   };
-
   return (
     <div className="flex-grow flex flex-col items-center md:pb-4">
       {!hasInitiated && (
         <div className="flex-grow flex flex-col justify-center items-center">
-          <div className="text-center w-3/4 p-6"></div>
-          <button onClick={() => mutate()} className={`btn-primary btn-wide btn ${isLoading && 'loading'}`}>
-            {isLoading ? `${loadingTextArray[currentLoadingTextIndex]}...` : 'Get Judged'}
-          </button>
+          <LoadingButtonWithChangingText
+            action={mutate}
+            isLoading={isLoading}
+            loadingTextArray={['Critiquing', 'Judging', 'Evaluating', 'Analyzing']}
+          />
         </div>
       )}
 
