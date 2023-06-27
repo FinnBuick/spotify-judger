@@ -1,3 +1,4 @@
+import createChatCompletion from '@/api/createChatCompletion';
 import getInitialMessage from '@/api/getInitialMessage';
 import ChatBubble from '@/components/chatBubble';
 import { LoadingButtonWithChangingText } from '@/components/loadingButton';
@@ -16,19 +17,22 @@ export default function Protected() {
 
   const { mutate, isLoading } = useMutation(
     async () => {
-      const { result } = await getInitialMessage();
-
-      if (!result) {
+      let res;
+      if (chatHistory.length === 0) {
+        res = await getInitialMessage();
+      } else {
+        res = await createChatCompletion([chatHistory?.at(-1)]);
+      }
+      if (!res) {
         toast.error('There was an issue connecting to Spotify, please try logging in again.');
       }
-
-      return result;
+      return res.result;
     },
     {
       onSuccess: (res) => {
         if (!res) return;
         setHasInitiated(true);
-        setChatHistory([...chatHistory, { role: 'assistant', content: res.message }]);
+        setChatHistory((prev) => [...prev, { role: 'assistant', content: res.message }]);
       },
       onError: () => {
         toast.error('There was an issue connecting to Spotify, please try logging in again.');
@@ -41,6 +45,7 @@ export default function Protected() {
 
     setChatHistory([...chatHistory, { role: 'user', content: inputText }]);
     mutate();
+    setInputText('');
   };
 
   return (
@@ -70,7 +75,6 @@ export default function Protected() {
             <div className="[overflow-anchor:auto] h-[1px]" />
           </div>
 
-          {/* text input */}
           <div className="pb-0.5 px-0.5">
             <div className="input-group flex items-center justify-center">
               <input
