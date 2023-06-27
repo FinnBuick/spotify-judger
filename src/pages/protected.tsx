@@ -2,7 +2,6 @@ import getInitialMessage from '@/api/getInitialMessage';
 import ChatBubble from '@/components/chatBubble';
 import { LoadingButtonWithChangingText } from '@/components/loadingButton';
 import Spinner from '@/components/spinner';
-import { useSession } from 'next-auth/react';
 import { ChatCompletionRequestMessage } from 'openai';
 import { useState } from 'react';
 import { toast } from 'react-hot-toast';
@@ -11,8 +10,6 @@ import { useMutation } from 'react-query';
 export interface ChatItem extends ChatCompletionRequestMessage {}
 
 export default function Protected() {
-  const { data: session } = useSession();
-
   const [hasInitiated, setHasInitiated] = useState(false);
   const [inputText, setInputText] = useState<string>('');
   const [chatHistory, setChatHistory] = useState<ChatItem[]>([]);
@@ -45,6 +42,7 @@ export default function Protected() {
     setChatHistory([...chatHistory, { role: 'user', content: inputText }]);
     mutate();
   };
+
   return (
     <div className="flex-grow flex flex-col items-center md:pb-4">
       {!hasInitiated && (
@@ -61,12 +59,7 @@ export default function Protected() {
         <div className="flex-grow flex flex-col rounded-lg shadow-xl backdrop-contrast-75 overflow-hidden md:w-2/3 xl:w-1/2">
           <div className="flex-grow px-1 overflow-y-scroll">
             {chatHistory.map(({ role, content }, index) => (
-              <ChatBubble
-                key={index}
-                role={role}
-                content={content}
-                avatar={role === 'user' ? session?.user?.name : '/open-ai-logo.svg'}
-              />
+              <ChatBubble key={index} role={role} content={content} />
             ))}
 
             {isLoading && (
