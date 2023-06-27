@@ -6,12 +6,12 @@ import Image from 'next/image';
 interface ChatBubbleProps {
   role: 'user' | 'assistant' | 'system';
   content: string;
-  avatar?: string | null;
 }
 
-export default function ChatBubble({ role, content, avatar }: ChatBubbleProps) {
+export default function ChatBubble({ role, content }: ChatBubbleProps) {
   const { data: session } = useSession();
   const user = session?.user;
+  const avatar = user?.image;
 
   const isUser = role === 'user';
 
@@ -40,7 +40,7 @@ export default function ChatBubble({ role, content, avatar }: ChatBubbleProps) {
     return (
       <div className="chat-image avatar">
         <div className="w-10 rounded-full">
-          <Image src="/dalle_robot.png" alt="avatar" />
+          <Image src="/dalle_robot.png" alt="avatar" width={40} height={40} />
         </div>
       </div>
     );
@@ -57,7 +57,7 @@ export default function ChatBubble({ role, content, avatar }: ChatBubbleProps) {
   return (
     <div className={`chat last:pb-4 ${isUser ? 'chat-end' : 'chat-start'}`}>
       {renderAvatar()}
-      <div className="chat-header">{role === 'assistant' ? CHAT_BOT_NAME : avatar}</div>
+      <div className="chat-header">{role === 'assistant' ? CHAT_BOT_NAME : user?.name}</div>
       <div className={`chat-bubble ${isUser ? 'chat-bubble-primary' : ''}`}>{content}</div>
     </div>
   );
