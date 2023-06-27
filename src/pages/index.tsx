@@ -1,3 +1,4 @@
+import { PROTECTED } from '@/common/constants';
 import { signIn, useSession } from 'next-auth/react';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
@@ -7,7 +8,7 @@ export default function Home() {
   const router = useRouter();
 
   if (session) {
-    router.push('/protected');
+    router.push(PROTECTED);
   }
 
   return (
@@ -25,7 +26,7 @@ export default function Home() {
         <div className="flex justify-center">
           <button
             className="m-auto mt-6 w-2/3 rounded-lg bg-green-500 px-6 py-3 text-white hover:bg-green-600"
-            onClick={() => signIn('spotify', { callbackUrl: '/protected' })}
+            onClick={() => signIn('spotify', { callbackUrl: PROTECTED })}
           >
             Login with Spotify
           </button>

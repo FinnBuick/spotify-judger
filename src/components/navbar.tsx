@@ -1,3 +1,4 @@
+import { HOME } from '@/common/constants';
 import { signOut, useSession } from 'next-auth/react';
 
 export default function Navbar() {
@@ -21,7 +22,7 @@ export default function Navbar() {
               <button
                 onClick={() =>
                   signOut({
-                    callbackUrl: '/',
+                    callbackUrl: HOME,
                   })
                 }
               >
