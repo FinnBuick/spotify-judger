@@ -3,10 +3,10 @@ import getInitialMessage from '@/api/getInitialMessage';
 import ChatBubble from '@/components/chatBubble';
 import { LoadingButtonWithChangingText } from '@/components/loadingButton';
 import Spinner from '@/components/spinner';
+import { useMutation } from '@tanstack/react-query';
 import { ChatCompletionRequestMessage } from 'openai';
 import { useState } from 'react';
 import { toast } from 'react-hot-toast';
-import { useMutation } from 'react-query';
 
 export interface ChatItem extends ChatCompletionRequestMessage {}
 
@@ -16,12 +16,12 @@ export default function Protected() {
   const [chatHistory, setChatHistory] = useState<ChatItem[]>([]);
 
   const { mutate, isLoading } = useMutation(
-    async () => {
+    async ({ input }: { input?: ChatItem }) => {
       let res;
-      if (chatHistory.length === 0) {
+      if (chatHistory.length === 0 || !input) {
         res = await getInitialMessage();
       } else {
-        res = await createChatCompletion([chatHistory?.at(-1)]);
+        res = await createChatCompletion([input]);
       }
       if (!res) {
         toast.error('There was an issue connecting to Spotify, please try logging in again.');
@@ -43,8 +43,12 @@ export default function Protected() {
   const handleSendMessage = () => {
     if (inputText.trim() === '') return;
 
-    setChatHistory([...chatHistory, { role: 'user', content: inputText }]);
-    mutate();
+    const newChatItem: ChatItem = {
+      role: 'user',
+      content: inputText,
+    };
+    setChatHistory([...chatHistory, newChatItem]);
+    mutate({ input: newChatItem });
     setInputText('');
   };
 
@@ -53,7 +57,7 @@ export default function Protected() {
       {!hasInitiated && (
         <div className="flex-grow flex flex-col justify-center items-center">
           <LoadingButtonWithChangingText
-            action={mutate}
+            action={() => mutate({})}
             isLoading={isLoading}
             loadingTextArray={['Critiquing', 'Judging', 'Evaluating', 'Analyzing']}
           />
