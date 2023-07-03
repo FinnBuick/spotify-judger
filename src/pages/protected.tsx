@@ -3,10 +3,13 @@ import getInitialMessage from '@/api/getInitialMessage';
 import ChatBubble from '@/components/chatBubble';
 import { LoadingButtonWithChangingText } from '@/components/loadingButton';
 import Spinner from '@/components/spinner';
+import { Timerange, timeRanges } from '@/types/spotify';
 import { useMutation } from '@tanstack/react-query';
 import { ChatCompletionRequestMessage } from 'openai';
 import { useState } from 'react';
 import { toast } from 'react-hot-toast';
+
+const SPOTIFY_API_LIMIT = 10;
 
 export interface ChatItem extends ChatCompletionRequestMessage {}
 
@@ -14,12 +17,13 @@ export default function Protected() {
   const [hasInitiated, setHasInitiated] = useState(false);
   const [inputText, setInputText] = useState<string>('');
   const [chatHistory, setChatHistory] = useState<ChatItem[]>([]);
+  const [timeRange, setTimeRange] = useState<Timerange>('short_term');
 
   const { mutate, isLoading } = useMutation(
     async ({ input }: { input?: ChatItem }) => {
       let res;
       if (chatHistory.length === 0 || !input) {
-        res = await getInitialMessage();
+        res = await getInitialMessage(timeRange, SPOTIFY_API_LIMIT);
       } else {
         res = await createChatCompletion([input]);
       }
@@ -56,6 +60,25 @@ export default function Protected() {
     <div className="flex-grow flex flex-col items-center md:pb-4">
       {!hasInitiated && (
         <div className="flex-grow flex flex-col justify-center items-center">
+          <div className="form-control w-full max-w-xs pb-4">
+            <label className="label">
+              <span className="label-text">Pick a time range you want the AI to analyze</span>
+            </label>
+            <select
+              className="select select-bordered w-full max-w-xs"
+              onChange={(event) => setTimeRange(event.target.value as Timerange)}
+            >
+              <option disabled value="none">
+                Select a time range
+              </option>
+              {timeRanges.map((timeRange) => (
+                <option key={timeRange} value={timeRange}>
+                  {formatTimeRange(timeRange)}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <LoadingButtonWithChangingText
             action={() => mutate({})}
             isLoading={isLoading}
@@ -102,4 +125,15 @@ export default function Protected() {
       )}
     </div>
   );
+}
+
+function formatTimeRange(timeRange: Timerange) {
+  switch (timeRange) {
+    case 'short_term':
+      return 'Last 4 weeks';
+    case 'medium_term':
+      return 'Last 6 months';
+    case 'long_term':
+      return 'All time';
+  }
 }

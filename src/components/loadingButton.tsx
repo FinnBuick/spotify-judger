@@ -17,7 +17,7 @@ export function LoadingButtonWithChangingText({
   }, 2000); // 2 seconds
 
   return (
-    <button onClick={action} className={`btn-primary btn-wide btn ${isLoading && 'loading'}`}>
+    <button onClick={action} className={`btn-primary btn-block btn ${isLoading && 'loading'}`}>
       {isLoading ? `${loadingTextArray[currentLoadingTextIndex]}...` : 'Get Judged'}
     </button>
   );

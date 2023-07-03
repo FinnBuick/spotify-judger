@@ -113,4 +113,7 @@ export interface TrackObject {
 }
 [];
 
-export type Timerange = 'short_term' | 'medium_term' | 'long_term'
+// export type Timerange = 'short_term' | 'medium_term' | 'long_term'
+export const timeRanges = ['short_term', 'medium_term', 'long_term'] as const;
+
+export type Timerange = (typeof timeRanges)[number];
