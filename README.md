@@ -76,6 +76,3 @@ Contributions to Spotify Judger are welcome! If you encounter any bugs, have sug
 
 Spotify Judger is open-source software licensed under the [MIT License](https://opensource.org/licenses/MIT). Feel free to modify and distribute the application as per the terms of the license.
 
-## Disclaimer
-
-This application is an example project and does not have commercial or official support. Use
