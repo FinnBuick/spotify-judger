@@ -7,7 +7,9 @@ export default function Navbar() {
   return (
     <div className="navbar bg-transparent">
       <div className="flex-1">
-        <a className="btn-ghost btn text-xl normal-case">Spotify Judger</a>
+        <a className="btn-ghost btn text-xl normal-case" href={HOME}>
+          Spotify Judger
+        </a>
       </div>
       <div className="flex-none gap-2">
         <div className="dropdown-end dropdown">
