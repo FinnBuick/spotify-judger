@@ -39,12 +39,18 @@ yarn install
 - Fill in the necessary environment variables in the `.env` file:
 
   ```
+  OPENAI_API_KEY=your-openai-api-key
   SPOTIFY_CLIENT_ID=your-spotify-client-id
   SPOTIFY_CLIENT_SECRET=your-spotify-client-secret
-  OPENAI_API_KEY=your-openai-api-key
+  NEXTAUTH_URL=http://localhost:3000
+  NEXTAUTH_SECRET=your-nextauth-secret
   ```
 
-  Replace `your-spotify-client-id`, `your-spotify-client-secret`, and `your-openai-api-key` with your respective credentials.
+  Replace `your-spotify-client-id`, `your-spotify-client-secret`, and `your-openai-api-key` with your respective credentials. You can obtain your Spotify API credentials by creating a Spotify Developer Account and registering a new application. You can obtain your OpenAI API key by creating an OpenAI account and generating an API key. You can generate a NextAuth secret by running the following command:
+
+  ```bash
+  openssl rand -base64 32
+  ```
 
 5. Start the application:
 
