@@ -12,11 +12,11 @@ export default function Home() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center w-full overflow-hidden">
+    <div className="flex flex-col items-center justify-center h-full">
       <div className="mx-auto max-w-3xl p-8">
         <div className="text-center">
           <Image className="mx-auto" src="/Spotify_logo_without_text.svg" alt="Spotify Logo" width={64} height={64} />
-          <h1 className="text-bg mt-6 text-8xl font-semibold">Spotify Judger</h1>
+          <h1 className="text-bg mt-6 text-8xl font-semibold xs:text-4xl">Spotify Judger</h1>
           <p className="mt-4 text-slate-900 text-lg">
             Spotify Judger is an app that gives you feedback on your music taste from an completely unbiased AI chatbot
             with objectively exquisite taste in music.
@@ -33,7 +33,7 @@ export default function Home() {
         </div>
       </div>
 
-      <svg>
+      <svg className="h-0">
         <filter id="noiseFilter">
           <feTurbulence type="fractalNoise" baseFrequency="0.6" stitchTiles="stitch" />
           <feColorMatrix in="colorNoise" type="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1 0" />
@@ -41,6 +41,6 @@ export default function Home() {
           <feBlend in="SourceGraphic" in2="monoNoise" mode="screen" />
         </filter>
       </svg>
-    </main>
+    </div>
   );
 }
