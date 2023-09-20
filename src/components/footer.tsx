@@ -38,7 +38,7 @@ function SocialIcons() {
           </svg>
         </span>
       </a>
-      <a href="https://www.linkedin.com/in/finn-buick/" target="_blank" rel="noreferrer">
+      {/* <a href="https://www.linkedin.com/in/finn-buick/" target="_blank" rel="noreferrer">
         <span className="social-icon">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -55,7 +55,7 @@ function SocialIcons() {
             <circle cx="4" cy="4" r="2"></circle>
           </svg>
         </span>
-      </a>
+      </a> */}
       <a href="https://github.com/FinnBuick/" target="_blank" rel="noreferrer">
         <span className="social-icon">
           <svg
